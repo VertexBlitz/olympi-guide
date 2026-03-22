@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Олимпиадный навигатор | Льготы в вузы</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* (стили без изменений, они полностью корректны) */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f4f7fb;
+            color: #1a2a3f;
+            padding: 2rem 1.5rem;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1a5f7a, #0e3b4f);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .header p {
+            color: #4a627a;
+            margin-top: 0.5rem;
+        }
+        .search-card {
+            background: white;
+            border-radius: 28px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            border: 1px solid #e2edf2;
+        }
+        .search-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .search-input-group {
+            flex: 2;
+            display: flex;
+            background: #f8fafc;
+            border-radius: 60px;
+            border: 1px solid #dce5ec;
+            overflow: hidden;
+        }
+        .search-input-group i {
+            padding: 0 1rem;
+            align-self: center;
+            color: #5a7e9a;
+        }
+        #searchInput {
+            flex: 1;
+            border: none;
+            padding: 0.8rem 0;
+            font-size: 1rem;
+            background: transparent;
+            outline: none;
+        }
+        .search-btn {
+            background: #1f6e8c;
+            border: none;
+            color: white;
+            padding: 0.8rem 1.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .search-btn:hover {
+            background: #0e4b63;
+        }
+        .filter-buttons {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            background: #eef2fc;
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #1f5e7a;
+        }
+        .filter-btn.active {
+            background: #1f6e8c;
+            color: white;
+        }
+        .main-layout {
+            display: flex;
+            gap: 2rem;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+        .filters-sidebar {
+            background: white;
+            border-radius: 28px;
+            padding: 1.5rem;
+            width: 260px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid #e2edf2;
+            position: sticky;
+            top: 1rem;
+        }
+        .filters-sidebar h3 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: #0a3b4f;
+        }
+        .filter-group {
+            margin-bottom: 1.5rem;
+        }
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: normal;
+            cursor: pointer;
+        }
+        .checkbox-group input {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        .reset-filters {
+            background: #eef2fc;
+            border: none;
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 1rem;
+        }
+        .results-area {
+            flex: 1;
+            min-width: 0;
+        }
+        .stats {
+            margin: 0 0 1rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .count-badge {
+            background: #e2edf2;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .programs-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .program-card {
+            background: white;
+            border-radius: 28px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border-left: 6px solid #1f6e8c;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .program-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+        }
+        .program-header {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            align-items: baseline;
+            margin-bottom: 0.8rem;
+        }
+        .program-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #0a3b4f;
+        }
+        .univ-tag {
+            font-size: 0.7rem;
+            background: #eef2fc;
+            padding: 0.2rem 0.7rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .program-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin: 0.8rem 0;
+            font-size: 0.85rem;
+            color: #4a627a;
+        }
+        .faculty, .study-mode {
+            font-weight: 500;
+            background: #f0f3f8;
+            padding: 0.2rem 0.7rem;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .benefit-badge {
+            background: #e0f0e6;
+            color: #1f6e4a;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+            margin-bottom: 0.3rem;
+        }
+        .olympiad-table {
+            margin-top: 1rem;
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        .olympiad-table th, .olympiad-table td {
+            padding: 0.6rem 0.4rem;
+            text-align: left;
+            border-bottom: 1px solid #e9edf2;
+        }
+        .olympiad-table th {
+            font-weight: 600;
+            color: #2c5a6e;
+        }
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 32px;
+            color: #5f7f9e;
+        }
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            font-size: 0.75rem;
+            color: #5f7f9e;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 32px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 1.8rem;
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1.2rem;
+            font-size: 1.8rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: #5f7f9e;
+        }
+        .modal-close:hover {
+            color: #1f6e8c;
+        }
+        .modal h2 {
+            font-size: 1.6rem;
+            margin-bottom: 0.5rem;
+            color: #0a3b4f;
+        }
+        .modal .modal-univ {
+            font-size: 1rem;
+            color: #4a627a;
+            margin-bottom: 1rem;
+        }
+        .modal .modal-section {
+            margin: 1rem 0;
+            border-top: 1px solid #e2edf2;
+            padding-top: 1rem;
+        }
+        .modal-section h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #1f6e8c;
+        }
+        .olympiad-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        .olympiad-list li {
+            margin-bottom: 0.5rem;
+            padding-left: 1.2rem;
+            position: relative;
+        }
+        .olympiad-list li:before {
+            content: "★";
+            color: #ffb347;
+            position: absolute;
+            left: 0;
+        }
+        .modal-link {
+            display: inline-block;
+            margin-top: 1rem;
+            background: #1f6e8c;
+            color: white;
+            padding: 0.5rem 1.2rem;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        @media (max-width: 800px) {
+            .main-layout {
+                flex-direction: column;
+            }
+            .filters-sidebar {
+                width: 100%;
+                position: static;
+                margin-bottom: 1rem;
+            }
+            .search-row {
+                flex-direction: column;
+            }
+            .search-input-group {
+                width: 100%;
+            }
+        }
+        .burger-filter {
+            display: none;
+            background: #1f6e8c;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            text-align: center;
+        }
+        @media (max-width: 800px) {
+            .burger-filter {
+                display: block;
+            }
+            .filters-sidebar {
+                display: none;
+            }
+            .filters-sidebar.open {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1><i class="fas fa-trophy"></i> Олимпиадный навигатор</h1>
+        <p>Введите предмет — узнайте программы с БВИ / 100 баллов / зачётом ДВИ. Кликните по карточке для подробной информации.</p>
+    </div>
+
+    <div class="search-card">
+        <div class="search-row">
+            <div class="search-input-group">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Например: математика, информатика, физика, история, обществознание" autocomplete="off">
+                <button class="search-btn" id="searchBtn">Найти</button>
+            </div>
+            <div class="filter-buttons" id="filterButtons">
+                <button class="filter-btn active" data-filter="all">Все вузы</button>
+                <button class="filter-btn" data-filter="МГУ">МГУ</button>
+                <button class="filter-btn" data-filter="СПбГУ">СПбГУ</button>
+                <button class="filter-btn" data-filter="ВШЭ">НИУ ВШЭ</button>
+                <button class="filter-btn" data-filter="МФТИ">МФТИ</button>
+                <button class="filter-btn" data-filter="МГИМО">МГИМО</button>
+                <button class="filter-btn" data-filter="РАНХиГС">РАНХиГС</button>
+                <button class="filter-btn" data-filter="РГГУ">РГГУ</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="burger-filter" id="burgerFilter">🔍 Показать фильтры</div>
+
+    <div class="main-layout">
+        <div class="filters-sidebar" id="filtersSidebar">
+            <h3>Тип льготы</h3>
+            <div class="filter-group">
+                <div class="checkbox-group">
+                    <label><input type="checkbox" id="filterBVI"> БВИ (без вступительных)</label>
+                    <label><input type="checkbox" id="filter100"> 100 баллов за ЕГЭ</label>
+                </div>
+            </div>
+            <h3>Уровень олимпиады</h3>
+            <div class="filter-group">
+                <div class="checkbox-group">
+                    <label><input type="checkbox" id="filterVseross"> ВсОШ</label>
+                    <label><input type="checkbox" id="filterLevel1"> I уровень</label>
+                    <label><input type="checkbox" id="filterLevel2"> II уровень</label>
+                    <label><input type="checkbox" id="filterLevel3"> III уровень</label>
+                </div>
+            </div>
+            <button class="reset-filters" id="resetFilters">Сбросить фильтры</button>
+        </div>
+
+        <div class="results-area">
+            <div class="stats">
+                <span><i class="fas fa-graduation-cap"></i> Найдено программ</span>
+                <span class="count-badge" id="resultsCount">0</span>
+            </div>
+            <div id="resultsContainer" class="programs-grid"></div>
+        </div>
+    </div>
+    <footer>Данные основаны на правилах приёма 2025. БВИ — без вступительных, 100 баллов — замена ЕГЭ, зачёт ДВИ — освобождение от внутреннего испытания.</footer>
+</div>
+
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <button class="modal-close" id="modalClose">&times;</button>
+        <div id="modalBody"></div>
+    </div>
+</div>
+
+<script>
+    // ========== БАЗА ДАННЫХ (с корректными ссылками) ==========
+    const programsDB = [
+        // === МГУ ===
+        { name: "Исторический факультет", univ: "МГУ", faculty: "Истфак", subjects: ["история"], benefits: ["БВИ", "100 баллов"], benefitTypes: ["БВИ", "100 баллов"], olympiadLevels: ["ВсОШ", "I"], form: "очная", level: "бакалавриат", desc: "46.03.01 История. БВИ для победителей ВсОШ, 100 баллов для призёров.", url: "https://www.msu.ru/", programUrl: "https://hist.msu.ru/",
+          olympiads: [ { name: "Всероссийская олимпиада школьников", level: "ВсОШ", profile: "история", right: "победители и призёры → БВИ" }, { name: "Олимпиада «Ломоносов» по истории", level: "I", profile: "история", right: "победители → БВИ, призёры → 100 баллов" }, { name: "Олимпиада «Покори Воробьёвы горы!» по истории", level: "I", profile: "история", right: "победители → БВИ, призёры → 100 баллов" } ] },
+        { name: "История искусств", univ: "МГУ", faculty: "Исторический факультет", subjects: ["история"], benefits: ["БВИ", "100 баллов"], benefitTypes: ["БВИ", "100 баллов"], olympiadLevels: ["ВсОШ", "I"], form: "очная", level: "бакалавриат", desc: "50.03.03 История искусств. Льготы по истории.", url: "https://www.msu.ru/", programUrl: "https://hist.msu.ru/",
+          olympiads: [ { name: "Всероссийская олимпиада школьников", level: "ВсОШ", profile: "история", right: "победители и призёры → БВИ" }, { name: "Олимпиада «Ломоносов» по истории", level: "I", profile: "история", right: "победители → БВИ, призёры → 100 баллов" } ] },
+        { name: "Механико-математический факультет", univ: "МГУ", faculty: "Мехмат", subjects: ["математика"], benefits: ["БВИ", "100 баллов"], benefitTypes: ["БВИ", "100 баллов"], olympiadLevels: ["ВсОШ", "I"], form: "очная", level: "бакалавриат", desc: "01.03.01 Математика. БВИ для победителей ВсОШ, 100 баллов для призёров.", url: "https://www.msu.ru/", programUrl: "https://www.math.msu.ru/",
+          olympiads: [ { name: "Всероссийская олимпиада школьников", level: "ВсОШ", profile: "математика", right: "победители и призёры → БВИ" }, { name: "Олимпиада «Ломоносов»", level: "I", profile: "математика", right: "победители → БВИ, призёры → 100 баллов" } ] },
+        { name: "Факультет вычислительной математики и кибернетики", univ: "МГУ", faculty: "ВМК", subjects: ["математика", "информатика"], benefits: ["БВИ", "100 баллов"], benefitTypes: ["БВИ", "100 баллов"], olympiadLevels: ["ВсОШ", "I"], form: "очная", level: "бакалавриат", desc: "01.03.02 Прикладная математика и информатика.", url: "https://www.msu.ru/", programUrl: "https://cs.msu.ru/",
+          olympiads: [ { name: "Всероссийская олимпиада школьников", level: "ВсОШ", profile: "математика, информатика", right: "победители и призёры → БВИ" }, { name: "Олимпиада «Ломоносов» по математике и информатике", level: "I", profile: "математика, информатика", right: "победители → БВИ, призёры → 100 баллов" } ] },
+        { name: "Физический факультет", univ: "МГУ", faculty: "Физфак", subjects: ["физика"], benefits: ["БВИ", "100 баллов"], benefitTypes: ["БВИ", "100 баллов"], olympiadLevels: ["ВсОШ", "I"], form: "очная", level: "бакалавриат", desc: "03.03.02 Физика.", url: "https://www.msu.ru/", programUrl: "https://phys.msu.ru/",
+          olympiads: [ { name: "Всероссийская олимпиада школьников", level: "ВсОШ", profile: "физика", right: "победители и призёры → БВИ" }, { name: "Олимпиада «Физтех»", level: "I", profile: "физика", right: "победители → БВИ, призёры → 100 баллов" } ] },
+        // === СПбГУ ===
+        { name: "История (46.03.01)", univ: "СПбГУ", faculty: "Институт истории", subjects: ["история"], benefits: ["БВИ"], benefitTypes: ["БВИ"], olympiadLevels: ["ВсОШ", "I", "II"], form: "очная", level: "бакалавриат", desc: "БВИ для победителей/призёров олимпиад I–II уровня по истории.", url: "https://spbu.ru/", programUrl: "https://spbu.ru/postupayushchim/bakalavriat/napravleniya-podgotovki/istoriya",
+          olympiads: [ { name: "Всероссийская олимпиада школьников", level: "ВсОШ", profile: "история", right: "победители и призёры → БВИ" }, { name: "Олимпиада СПбГУ по истории", level: "I", profile: "история", right: "победители и призёры → БВИ" } ] },
+        { name: "История искусств", univ: "СПбГУ", faculty: "Институт истории", subjects: ["история"], benefits: ["БВИ", "100 баллов"], benefitTypes: ["БВИ", "100 баллов"], olympiadLevels: ["ВсОШ", "I", "II"], form: "очная", level: "бакалавриат", desc: "50.03.03 История искусств. БВИ для победителей, 100 баллов для призёров олимпиад I–II уровня.", url: "https://spbu.ru/", programUrl: "https://spbu.ru/postupayushchim/bakalavriat/napravleniya-podgotovki/istoriya-iskusstv",
+          olympiads: [ { name: "Всероссийская олимпиада школьников", level: "ВсОШ", profile: "история", right: "победители → БВИ, призёры → 100 баллов" }, { name: "Олимпиада СПбГУ по истории", level: "I", profile: "история", right: "победители → БВИ, призёры → 100 баллов" } ] },
+        { name: "Математика (01.03.01)", univ: "СПбГУ", faculty: "Математико-механический факультет", subjects: ["математика"], benefits: ["БВИ"], benefitTypes: ["БВИ"], olympiadLevels: ["ВсОШ", "I", "II"], form: "очная", level: "бакалавриат", desc: "БВИ для победителей/призёров олимпиад I–II уровня по математике.", url: "https://spbu.ru/", programUrl: "https://spbu.ru/postupayushchim/bakalavriat/napravleniya-podgotovki/matematika",
+          olympiads: [ { name: "Всероссийская олимпиада школьников", level: "ВсОШ", profile: "математика", right: "победители и призёры → БВИ" }, { name: "Олимпиада СПбГУ по математике", level: "I", profile: "математика", right: "победители и призёры → БВИ" } ] },
+        { name: "Прикладная математика и информатика (01.03.02)", univ: "СПбГУ", faculty: "Матмех", subjects: ["математика", "информатика"], benefits: ["БВИ"], benefitTypes: ["БВИ"], olympiadLevels: ["ВсОШ", "I", "II"], form: "очная", level: "бакалавриат", desc: "БВИ для победителей I–II уровня по математике или информатике.", url: "https://spbu.ru/", programUrl: "https://spbu.ru/postupayushchim/bakalavriat/napravleniya-podgotovki/prikladnaya-matematika-i-informatika",
+          olympiads: [ { name: "Всероссийская олимпиада школьников", level: "ВсОШ", profile: "математика, информатика", right: "победители и призёры → БВИ" }, { name: "Олимпиада СПбГУ по математике и информатике", level: "I", profile: "математика, информатика", right: "победители и призёры → БВИ" } ] },
+        // === НИУ ВШЭ ===
+        { name: "История (Москва)", univ: "ВШЭ", faculty: "Факультет гуманитарных наук", subjects: ["история"], benefits: ["БВИ"], benefitTypes: ["БВИ"], olympiadLevels: ["ВсОШ", "I", "II"], form: "очная", level: "бакалавриат", desc: "46.03.01 История. БВИ для победителей/призёров ВсОШ и перечневых I–II уровня.", url: "https://www.hse.ru/", programUrl: "https://www.hse.ru/ba/hist/",
+          olympiads: [ { name: "Всероссийская олимпиада школьников", level: "ВсОШ", profile: "история", right: "победители и призёры → БВИ" }, { name: "Олимпиада «Высшая проба»", level: "I", profile: "история", right: "победители → БВИ, призёры → 100 баллов" }, { name: "Олимпиада «Ломоносов» по истории", level: "I", profile: "история", right: "победители → БВИ, призёры → 100 баллов" } ] },
+        { name: "История (Санкт-Петербург)", univ: "ВШЭ", faculty: "Санкт-Петербургская школа гуманитарных наук", subjects: ["история"], benefits: ["БВИ", "100 баллов"], benefitTypes: ["БВИ", "100 баллов"], olympiadLevels: ["ВсОШ", "I", "II"], form: "очная", level: "бакалавриат", desc: "46.03.01 История. БВИ для победителей ВсОШ, 100 баллов для призёров.", url: "https://spb.hse.ru/", programUrl: "https://spb.hse.ru/ba/hist/",
+          olympiads: [ { name: "Всероссийская олимпиада школьников", level: "ВсОШ", profile: "история", right: "победители → БВИ, призёры → 100 баллов" }, { name: "Олимпиада «Высшая проба»", level: "I", profile: "история", right: "победители → БВИ, призёры → 100 баллов" } ] },
+        { name: "Прикладная математика (Москва)", univ: "ВШЭ", faculty: "Факультет компьютерных наук", subjects: ["математика", "информатика"], benefits: ["БВИ", "100 баллов"], benefitTypes: ["БВИ", "100 баллов"], olympiadLevels: ["ВсОШ", "I", "II"], form: "очная", level: "бакалавриат", desc: "БВИ для победителей ВсОШ и перечневых I–II уровня, 100 баллов для призёров.", url: "https://www.hse.ru/", programUrl: "https://www.hse.ru/ba/am/",
+          olympiads: [ { name: "Всероссийская олимпиада школьников", level: "ВсОШ", profile: "математика, информатика", right: "победители → БВИ, призёры → 100 баллов" }, { name: "Олимпиада «Высшая проба»", level: "I", profile: "математика, информатика", right: "победители → БВИ, призёры → 100 баллов" } ] },
+        // === МФТИ ===
+        { name: "Физтех-школа прикладной математики и информатики (ФПМИ)", univ: "МФТИ", faculty: "ФПМИ", subjects: ["математика", "информатика", "физика"], benefits: ["БВИ", "100 баллов"], benefitTypes: ["БВИ", "100 баллов"], olympiadLevels: ["ВсОШ", "I", "II"], form: "очная", level: "бакалавриат", desc: "01.03.02 Прикладная математика и информатика.", url: "https://mipt.ru/", programUrl: "https://mipt.ru/abiturient/fpmi/",
+          olympiads: [ { name: "Всероссийская олимпиада школьников", level: "ВсОШ", profile: "математика, физика, информатика", right: "победители → БВИ, призёры → 100 баллов" }, { name: "Олимпиада «Физтех»", level: "I", profile: "математика, физика", right: "победители → БВИ, призёры → 100 баллов" } ] },
+        { name: "Физтех-школа радиоэлектроники и компьютерных технологий (ФРКТ)", univ: "МФТИ", faculty: "ФРКТ", subjects: ["физика", "математика", "информатика"], benefits: ["БВИ", "100 баллов"], benefitTypes: ["БВИ", "100 баллов"], olympiadLevels: ["ВсОШ", "I"], form: "очная", level: "бакалавриат", desc: "11.03.02 Инфокоммуникационные технологии.", url: "https://mipt.ru/", programUrl: "https://mipt.ru/abiturient/frkt/",
+          olympiads: [ { name: "Всероссийская олимпиада школьников", level: "ВсОШ", profile: "физика, математика, информатика", right: "победители → БВИ, призёры → 100 баллов" }, { name: "Олимпиада «Физтех»", level: "I", profile: "физика, математика", right: "победители → БВИ, призёры → 100 баллов" } ] },
+        // === МГИМО ===
+        { name: "Международные отношения", univ: "МГИМО", faculty: "Факультет международных отношений", subjects: ["история", "обществознание"], benefits: ["БВИ", "100 баллов"], benefitTypes: ["БВИ", "100 баллов"], olympiadLevels: ["ВсОШ", "I"], form: "очная", level: "бакалавриат", desc: "41.03.05 Международные отношения.", url: "https://mgimo.ru/", programUrl: "https://mgimo.ru/study/faculty/mo/",
+          olympiads: [ { name: "Всероссийская олимпиада школьников", level: "ВсОШ", profile: "история, обществознание", right: "победители → БВИ, призёры → 100 баллов" }, { name: "Олимпиада МГИМО по истории и обществознанию", level: "I", profile: "история, обществознание", right: "победители → БВИ, призёры → 100 баллов" } ] },
+        { name: "Политология", univ: "МГИМО", faculty: "Факультет политологии", subjects: ["обществознание"], benefits: ["БВИ", "100 баллов"], benefitTypes: ["БВИ", "100 баллов"], olympiadLevels: ["ВсОШ", "I"], form: "очная", level: "бакалавриат", desc: "41.03.04 Политология.", url: "https://mgimo.ru/", programUrl: "https://mgimo.ru/study/faculty/politology/",
+          olympiads: [ { name: "Всероссийская олимпиада школьников", level: "ВсОШ", profile: "обществознание", right: "победители → БВИ, призёры → 100 баллов" }, { name: "Олимпиада МГИМО по обществознанию", level: "I", profile: "обществознание", right: "победители → БВИ, призёры → 100 баллов" } ] },
+        // === РАНХиГС === (исправлены ссылки)
+        { name: "Государственное и муниципальное управление", univ: "РАНХиГС", faculty: "ИГСУ", subjects: ["обществознание"], benefits: ["БВИ", "100 баллов"], benefitTypes: ["БВИ", "100 баллов"], olympiadLevels: ["ВсОШ", "I"], form: "очная", level: "бакалавриат", desc: "38.03.04 Государственное и муниципальное управление.", url: "https://ranepa.ru/", programUrl: "https://ranepa.ru/abitur/bakalavriat/napravleniya/gmu/",
+          olympiads: [ { name: "Всероссийская олимпиада школьников", level: "ВсОШ", profile: "обществознание", right: "победители → БВИ, призёры → 100 баллов" } ] },
+        { name: "Экономика", univ: "РАНХиГС", faculty: "Институт экономики", subjects: ["математика", "обществознание"], benefits: ["БВИ", "100 баллов"], benefitTypes: ["БВИ", "100 баллов"], olympiadLevels: ["ВсОШ", "I"], form: "очная", level: "бакалавриат", desc: "38.03.01 Экономика.", url: "https://ranepa.ru/", programUrl: "https://ranepa.ru/abitur/bakalavriat/napravleniya/ekonomika/",
+          olympiads: [ { name: "Всероссийская олимпиада школьников", level: "ВсОШ", profile: "математика, обществознание", right: "победители → БВИ, призёры → 100 баллов" }, { name: "Олимпиада «Высшая проба»", level: "I", profile: "экономика", right: "победители → БВИ, призёры → 100 баллов" } ] },
+        { name: "История", univ: "РАНХиГС", faculty: "Институт общественных наук", subjects: ["история"], benefits: ["БВИ", "100 баллов"], benefitTypes: ["БВИ", "100 баллов"], olympiadLevels: ["ВсОШ", "I"], form: "очная", level: "бакалавриат", desc: "46.03.01 История. БВИ для победителей ВсОШ, 100 баллов для призёров.", url: "https://ranepa.ru/", programUrl: "https://ranepa.ru/abitur/bakalavriat/",  // общая страница бакалавриата
+          olympiads: [ { name: "Всероссийская олимпиада школьников", level: "ВсОШ", profile: "история", right: "победители → БВИ, призёры → 100 баллов" }, { name: "Олимпиада РАНХиГС по истории", level: "I", profile: "история", right: "победители → БВИ, призёры → 100 баллов" } ] },
+        { name: "История и культурология", univ: "РАНХиГС", faculty: "Институт общественных наук", subjects: ["история"], benefits: ["БВИ", "100 баллов"], benefitTypes: ["БВИ", "100 баллов"], olympiadLevels: ["ВсОШ", "I"], form: "очная", level: "бакалавриат", desc: "46.03.01 История (профиль «История и культурология»).", url: "https://ranepa.ru/", programUrl: "https://ranepa.ru/abitur/bakalavriat/",  // общая страница
+          olympiads: [ { name: "Всероссийская олимпиада школьников", level: "ВсОШ", profile: "история", right: "победители → БВИ, призёры → 100 баллов" }, { name: "Олимпиада РАНХиГС по истории", level: "I", profile: "история", right: "победители → БВИ, призёры → 100 баллов" } ] },
+        // === РГГУ ===
+        { name: "История", univ: "РГГУ", faculty: "Историко-архивный институт", subjects: ["история"], benefits: ["БВИ", "100 баллов"], benefitTypes: ["БВИ", "100 баллов"], olympiadLevels: ["ВсОШ", "I"], form: "очная", level: "бакалавриат", desc: "46.03.01 История.", url: "https://rsuh.ru/", programUrl: "https://rsuh.ru/abiturientu/bakalavriat/istoriya.php",
+          olympiads: [ { name: "Всероссийская олимпиада школьников", level: "ВсОШ", profile: "история", right: "победители → БВИ, призёры → 100 баллов" }, { name: "Олимпиада «Ломоносов» по истории", level: "I", profile: "история", right: "победители → БВИ, призёры → 100 баллов" } ] },
+        { name: "Филология (отечественная филология)", univ: "РГГУ", faculty: "Филологический факультет", subjects: ["литература"], benefits: ["БВИ", "100 баллов"], benefitTypes: ["БВИ", "100 баллов"], olympiadLevels: ["ВсОШ", "I"], form: "очная", level: "бакалавриат", desc: "45.03.01 Филология.", url: "https://rsuh.ru/", programUrl: "https://rsuh.ru/abiturientu/bakalavriat/filologiya.php",
+          olympiads: [ { name: "Всероссийская олимпиада школьников", level: "ВсОШ", profile: "литература", right: "победители → БВИ, призёры → 100 баллов" } ] }
+    ];
+
+    let currentFilter = "all";
+    let currentSearch = "";
+    let filterBVI = false;
+    let filter100 = false;
+    let filterVseross = false;
+    let filterLevel1 = false;
+    let filterLevel2 = false;
+    let filterLevel3 = false;
+
+    function normalizeSubject(input) {
+        const lower = input.trim().toLowerCase();
+        const map = {
+            "математика": "математика", "мат": "математика",
+            "информатика": "информатика", "инф": "информатика", "программирование": "информатика",
+            "физика": "физика", "физ": "физика",
+            "история": "история", "ист": "история",
+            "обществознание": "обществознание", "общество": "обществознание",
+            "биология": "биология", "био": "биология",
+            "химия": "химия", "хим": "химия",
+            "литература": "литература", "лит": "литература"
+        };
+        for (let [key, value] of Object.entries(map)) {
+            if (lower.includes(key)) return value;
+        }
+        return null;
+    }
+
+    function filterPrograms(programs) {
+        return programs.filter(prog => {
+            if (currentSearch) {
+                const subject = normalizeSubject(currentSearch);
+                if (!subject || !prog.subjects.includes(subject)) return false;
+            }
+            if (currentFilter !== "all" && prog.univ !== currentFilter) return false;
+            if (filterBVI && !prog.benefitTypes.includes("БВИ")) return false;
+            if (filter100 && !prog.benefitTypes.includes("100 баллов")) return false;
+            if (filterVseross && !prog.olympiadLevels.includes("ВсОШ")) return false;
+            if (filterLevel1 && !prog.olympiadLevels.includes("I")) return false;
+            if (filterLevel2 && !prog.olympiadLevels.includes("II")) return false;
+            if (filterLevel3 && !prog.olympiadLevels.includes("III")) return false;
+            return true;
+        });
+    }
+
+    function renderResults() {
+        const container = document.getElementById("resultsContainer");
+        const countSpan = document.getElementById("resultsCount");
+        let filtered = filterPrograms(programsDB);
+
+        if (filtered.length === 0) {
+            container.innerHTML = `<div class="no-results">По вашему запросу ничего не найдено. Попробуйте изменить фильтры или поисковый запрос.</div>`;
+            countSpan.innerText = "0";
+            return;
+        }
+
+        let html = "";
+        filtered.forEach(prog => {
+            const badges = prog.benefits.map(b => `<span class="benefit-badge"><i class="fas fa-star-of-life"></i> ${b}</span>`).join('');
+            const facultyHtml = prog.faculty ? `<span class="faculty"><i class="fas fa-building"></i> ${prog.faculty}</span>` : '';
+            const formIcon = prog.form === "онлайн" ? '<i class="fas fa-wifi"></i>' : '<i class="fas fa-chalkboard-user"></i>';
+            const levelIcon = prog.level === "магистратура" ? '<i class="fas fa-graduation-cap"></i>' : '<i class="fas fa-user-graduate"></i>';
+            html += `
+                <div class="program-card" data-program='${JSON.stringify(prog).replace(/'/g, "&apos;")}'>
+                    <div class="program-header">
+                        <div class="program-name">${prog.name}</div>
+                        <div class="univ-tag"><i class="fas fa-university"></i> ${prog.univ}</div>
+                    </div>
+                    <div class="program-meta">
+                        ${facultyHtml}
+                        <span class="study-mode">${formIcon} ${prog.form === "онлайн" ? "онлайн" : "очная"}</span>
+                        <span class="study-mode">${levelIcon} ${prog.level === "магистратура" ? "магистратура" : "бакалавриат"}</span>
+                        ${badges}
+                    </div>
+                    <div class="program-desc">${prog.desc}</div>
+                    <table class="olympiad-table">
+                        <thead><tr><th>Уровень олимпиад</th><th>Профиль</th><th>Право</th> </thead>
+                        <tbody> <tr><td>ВсОШ / перечневые I–II уровня</td><td>${prog.subjects.join(", ")}</td><td>${prog.benefits.join(", ")}</td></tr> </tbody>
+                    </table>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+        countSpan.innerText = filtered.length;
+
+        document.querySelectorAll('.program-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const progData = JSON.parse(card.getAttribute('data-program'));
+                showModal(progData);
+            });
+        });
+    }
+
+    function showModal(program) {
+        const modal = document.getElementById('modal');
+        const modalBody = document.getElementById('modalBody');
+        const badges = program.benefits.map(b => `<span class="benefit-badge">${b}</span>`).join('');
+        const formIcon = program.form === "онлайн" ? '<i class="fas fa-wifi"></i>' : '<i class="fas fa-chalkboard-user"></i>';
+        const levelIcon = program.level === "магистратура" ? '<i class="fas fa-graduation-cap"></i>' : '<i class="fas fa-user-graduate"></i>';
+        
+        let olympiadHtml = '';
+        if (program.olympiads && program.olympiads.length) {
+            olympiadHtml = `
+                <div class="modal-section">
+                    <h3>🏆 Перечневые олимпиады, дающие льготы</h3>
+                    <ul class="olympiad-list">
+                        ${program.olympiads.map(o => `<li><strong>${o.name}</strong> (${o.level}) — профиль «${o.profile}»: ${o.right}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        } else {
+            olympiadHtml = `<div class="modal-section"><p>Для данной программы льготы предоставляются победителям и призёрам Всероссийской олимпиады школьников и олимпиад I–II уровня по профильным предметам.</p></div>`;
+        }
+
+        modalBody.innerHTML = `
+            <h2>${program.name}</h2>
+            <div class="modal-univ"><i class="fas fa-university"></i> ${program.univ} • ${program.faculty || ''}</div>
+            <div class="program-meta" style="margin-bottom: 1rem;">
+                <span class="study-mode">${formIcon} ${program.form === "онлайн" ? "онлайн" : "очная"}</span>
+                <span class="study-mode">${levelIcon} ${program.level === "магистратура" ? "магистратура" : "бакалавриат"}</span>
+                ${badges}
+            </div>
+            <div class="modal-section">
+                <h3>📖 О программе</h3>
+                <p>${program.desc}</p>
+            </div>
+            ${olympiadHtml}
+            <div class="modal-section">
+                <a href="${program.programUrl || program.url}" target="_blank" class="modal-link"><i class="fas fa-external-link-alt"></i> Подробнее на сайте вуза</a>
+            </div>
+        `;
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('modal');
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    function updateFiltersAndRender() {
+        renderResults();
+    }
+
+    // Обработчики событий
+    document.getElementById("searchBtn").addEventListener("click", () => {
+        currentSearch = document.getElementById("searchInput").value;
+        updateFiltersAndRender();
+    });
+    document.getElementById("searchInput").addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+            currentSearch = e.target.value;
+            updateFiltersAndRender();
+        }
+    });
+    document.querySelectorAll(".filter-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            currentFilter = btn.getAttribute("data-filter");
+            updateFiltersAndRender();
+        });
+    });
+    document.getElementById("filterBVI").addEventListener("change", (e) => {
+        filterBVI = e.target.checked;
+        updateFiltersAndRender();
+    });
+    document.getElementById("filter100").addEventListener("change", (e) => {
+        filter100 = e.target.checked;
+        updateFiltersAndRender();
+    });
+    document.getElementById("filterVseross").addEventListener("change", (e) => {
+        filterVseross = e.target.checked;
+        updateFiltersAndRender();
+    });
+    document.getElementById("filterLevel1").addEventListener("change", (e) => {
+        filterLevel1 = e.target.checked;
+        updateFiltersAndRender();
+    });
+    document.getElementById("filterLevel2").addEventListener("change", (e) => {
+        filterLevel2 = e.target.checked;
+        updateFiltersAndRender();
+    });
+    document.getElementById("filterLevel3").addEventListener("change", (e) => {
+        filterLevel3 = e.target.checked;
+        updateFiltersAndRender();
+    });
+    document.getElementById("resetFilters").addEventListener("click", () => {
+        filterBVI = false;
+        filter100 = false;
+        filterVseross = false;
+        filterLevel1 = false;
+        filterLevel2 = false;
+        filterLevel3 = false;
+        document.getElementById("filterBVI").checked = false;
+        document.getElementById("filter100").checked = false;
+        document.getElementById("filterVseross").checked = false;
+        document.getElementById("filterLevel1").checked = false;
+        document.getElementById("filterLevel2").checked = false;
+        document.getElementById("filterLevel3").checked = false;
+        updateFiltersAndRender();
+    });
+    document.getElementById("modalClose").addEventListener("click", closeModal);
+    document.getElementById("modal").addEventListener("click", (e) => {
+        if (e.target === document.getElementById("modal")) closeModal();
+    });
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && document.getElementById("modal").classList.contains("active")) closeModal();
+    });
+    const burger = document.getElementById("burgerFilter");
+    const sidebar = document.getElementById("filtersSidebar");
+    burger.addEventListener("click", () => {
+        sidebar.classList.toggle("open");
+        burger.textContent = sidebar.classList.contains("open") ? "✖ Скрыть фильтры" : "🔍 Показать фильтры";
+    });
+
+    updateFiltersAndRender();
+</script>
+</body>
+</html>
